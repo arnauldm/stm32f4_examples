@@ -141,9 +141,6 @@
 #endif
 
 #include <stdint.h>                      /*!< standard types definitions                      */
-#include <core_cmInstr.h>                /*!< Core Instruction Access                         */
-#include <core_cmFunc.h>                 /*!< Core Function Access                            */
-#include <core_cm4_simd.h>               /*!< Compiler specific SIMD Intrinsics               */
 
 #endif /* __CORE_CM4_H_GENERIC */
 
@@ -1248,12 +1245,16 @@ static __INLINE void NVIC_DecodePriority (uint32_t Priority, uint32_t PriorityGr
  */
 static __INLINE void NVIC_SystemReset(void)
 {
-  __DSB();                                                     /* Ensure all outstanding memory accesses included
-                                                                  buffered write are completed before reset */
+  __ASM volatile ("dsb"); /* Ensure all outstanding memory accesses
+included buffered write are completed before reset */
+
   SCB->AIRCR  = ((0x5FA << SCB_AIRCR_VECTKEY_Pos)      |
                  (SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) |
                  SCB_AIRCR_SYSRESETREQ_Msk);                   /* Keep priority group unchanged */
-  __DSB();                                                     /* Ensure completion of memory access */
+
+  __ASM volatile ("dsb"); /* Ensure all outstanding memory accesses
+included buffered write are completed before reset */
+
   while(1);                                                    /* wait until reset */
 }
 
