@@ -1,7 +1,5 @@
 #include "init.h"
 
-void SetSysClock(void)
-{
 /*
  *
  * Configures the System clock source, PLL Multiplier and Divider factors,
@@ -10,10 +8,12 @@ void SetSysClock(void)
  * is reset to the default reset state (done in SystemInit() function).
  *
  */
+void SetSysClock(void)
+{
 
-/******************************************************************************/
-/*            PLL (clocked by HSE) used as System clock source                */
-/******************************************************************************/
+    /********************************************************/
+    /*  PLL (clocked by HSE) used as System clock source    */
+    /********************************************************/
     __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
 
     /* Enable HSE */
@@ -65,9 +65,11 @@ void SetSysClock(void)
         RCC->CFGR |= RCC_CFGR_SW_PLL;
 
         /* Wait till the main PLL is used as system clock source */
-        while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
-    } else {                    /* If HSE fails to start-up, the application will have wrong clock
-                                   configuration. User can add here some code to deal with this error */
+        while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL)
+            ;
+    } else {
+        /* If HSE fails to start-up, the application will have wrong clock
+           configuration. User can add here some code to deal with this error */
     }
 
 }
@@ -99,14 +101,11 @@ void system_init(void)
     /* Disable all interrupts */
     RCC->CIR = 0x00000000;
 
-    /*
-     * Configure the System clock source, PLL Multiplier and Divider factors,
-     * AHB/APBx prescalers and Flash settings
-     */
+    /* Configure the System clock source, PLL Multiplier and Divider factors,
+       AHB/APBx prescalers and Flash settings */
     SetSysClock();
 
-    /*
-     * Configure the Vector Table location add offset address
-     */
+    /* Configure the Vector Table location add offset address */
     SCB->VTOR = FLASH_BASE | VECT_TAB_OFFSET;   /* Vector Table Relocation in Internal FLASH */
 }
+
