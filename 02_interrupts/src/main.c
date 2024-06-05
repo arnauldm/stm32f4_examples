@@ -10,99 +10,100 @@
 
 int currentLED = LED_GREEN;
 
-void udelay(__IO uint32_t d) {
-   __IO uint32_t i = 0;
-   for (i = 0; i < d; i++);
+void udelay(__IO uint32_t d)
+{
+    __IO uint32_t i = 0;
+    for (i = 0; i < d; i++);
 }
 
 void EXTI0_IRQHandler(void)
 {
-   /* Clear the led */
-   GPIOD->ODR &= ~(1 << currentLED);   
+    /* Clear the led */
+    GPIOD->ODR &= ~(1 << currentLED);
 
-   /* Change current led */
-   currentLED = (currentLED == LED_GREEN) ? LED_RED : LED_GREEN;
+    /* Change current led */
+    currentLED = (currentLED == LED_GREEN) ? LED_RED : LED_GREEN;
 
-   /* Clear Pending Request bit to acknowledge the interrupt (this bit is
-    * cleared by programming it to 1 ! */
-   EXTI->PR = EXTI_Line0;
+    /* Clear Pending Request bit to acknowledge the interrupt (this bit is
+     * cleared by programming it to 1 ! */
+    EXTI->PR = EXTI_Line0;
 }
 
-int main(void) {
+int main(void)
+{
 
-   system_init();
+    system_init();
 
-   /* 
-    * Enable LEDs
-    */
+    /* 
+     * Enable LEDs
+     */
 
-   /* GPIOD Periph clock enable */
-   RCC->AHB1ENR  = RCC_AHB1ENR_GPIODEN;
+    /* GPIOD Periph clock enable */
+    RCC->AHB1ENR = RCC_AHB1ENR_GPIODEN;
 
-   /* Set pins to output mode */
-   GPIOD->MODER |=1 << (LED_GREEN * 2);
-   GPIOD->MODER |=1 << (LED_RED * 2);
+    /* Set pins to output mode */
+    GPIOD->MODER |= 1 << (LED_GREEN * 2);
+    GPIOD->MODER |= 1 << (LED_RED * 2);
 
-   /* Clear the leds (write low signal to the outputs) */
-   GPIOD->ODR &= ~(1 << LED_GREEN);
-   GPIOD->ODR &= ~(1 << LED_RED);
+    /* Clear the leds (write low signal to the outputs) */
+    GPIOD->ODR &= ~(1 << LED_GREEN);
+    GPIOD->ODR &= ~(1 << LED_RED);
 
-   /* 
-    * Enable the blue button
-    */
+    /* 
+     * Enable the blue button
+     */
 
-   /* GPIOA Periph clock enable */
-   RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;      
+    /* GPIOA Periph clock enable */
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
 
-   /* GPIOA0 pin set to input mode (00) */
-   GPIOA->MODER   &= ~(3 << (BLUE_BUTTON * 2));   
+    /* GPIOA0 pin set to input mode (00) */
+    GPIOA->MODER &= ~(3 << (BLUE_BUTTON * 2));
 
-   /* Push-pull mode (0) */
-   GPIOA->OTYPER  &= ~(1 << BLUE_BUTTON);         
+    /* Push-pull mode (0) */
+    GPIOA->OTYPER &= ~(1 << BLUE_BUTTON);
 
-   /* Default (idle) state is at 0V. Set GPIO pin to pull-down (2) */
-   GPIOA->PUPDR   &= ~(3 << (BLUE_BUTTON * 2));   /* clear bits */
-   GPIOA->PUPDR   |=  (2 << (BLUE_BUTTON * 2)); 
+    /* Default (idle) state is at 0V. Set GPIO pin to pull-down (2) */
+    GPIOA->PUPDR &= ~(3 << (BLUE_BUTTON * 2));  /* clear bits */
+    GPIOA->PUPDR |= (2 << (BLUE_BUTTON * 2));
 
-   /* Set GPIO Speed to high speed (2) */
-   GPIOA->OSPEEDR &= ~(3 << (BLUE_BUTTON * 2));   /* clear bits */
-   GPIOA->OSPEEDR |=  (2 << (BLUE_BUTTON * 2));   
+    /* Set GPIO Speed to high speed (2) */
+    GPIOA->OSPEEDR &= ~(3 << (BLUE_BUTTON * 2));    /* clear bits */
+    GPIOA->OSPEEDR |= (2 << (BLUE_BUTTON * 2));
 
-   /* 
-    * Enable interrupts
-    */
+    /* 
+     * Enable interrupts
+     */
 
-   /* P<port>x interrupts are managed by the EXTIx interrupt line. Thus,
-    * interrupts on BLUE_BUTTON are managed by EXTI0. BLUE_BUTTON is attached
-    * on the PA0 pin but EXTI0 can also manage interrupts on ports PB0, PC0,
-    * PD0, etc. We must indicate in SYSCFG_EXTICR1 register that EXTI0 will
-    * only manage PAx pins (BLUE_BUTTON) (p. 293) */
-   SYSCFG->EXTICR[0] &= 0xfffffff0;
+    /* P<port>x interrupts are managed by the EXTIx interrupt line. Thus,
+     * interrupts on BLUE_BUTTON are managed by EXTI0. BLUE_BUTTON is attached
+     * on the PA0 pin but EXTI0 can also manage interrupts on ports PB0, PC0,
+     * PD0, etc. We must indicate in SYSCFG_EXTICR1 register that EXTI0 will
+     * only manage PAx pins (BLUE_BUTTON) (p. 293) */
+    SYSCFG->EXTICR[0] &= 0xfffffff0;
 
-   /* Clear EXTI line configuration */
-   EXTI->IMR |=  EXTI_Line0;  /* Interrupt request from line x is not masked (1) */
-   EXTI->EMR &= ~EXTI_Line0;  /* Event Mask Register is masked (0) */
+    /* Clear EXTI line configuration */
+    EXTI->IMR |= EXTI_Line0;    /* Interrupt request from line x is not masked (1) */
+    EXTI->EMR &= ~EXTI_Line0;   /* Event Mask Register is masked (0) */
 
-   /* Trigger the selected external interrupt on rising edge */
-   EXTI->RTSR |= EXTI_Line0;  /* Rising */
-   EXTI->FTSR &= ~EXTI_Line0;  /* Clear falling */
+    /* Trigger the selected external interrupt on rising edge */
+    EXTI->RTSR |= EXTI_Line0;   /* Rising */
+    EXTI->FTSR &= ~EXTI_Line0;  /* Clear falling */
 
-   /* Set the IRQ priority level (in the range 0-15). The lower the value, the
-    * greater the priority is. The Reset, Hard fault, and NMI exceptions, with
-    * fixed negative priority values, always have higher priority than any other
-    * exception. When the processor is executing an exception handler, the
-    * exception handler is preempted if a higher priority exception occurs. 
-    * Note: 'EXTI0_IRQn' stands for EXTI Line0 Interrupt */
-   NVIC->IP[EXTI0_IRQn] = 0;
+    /* Set the IRQ priority level (in the range 0-15). The lower the value, the
+     * greater the priority is. The Reset, Hard fault, and NMI exceptions, with
+     * fixed negative priority values, always have higher priority than any other
+     * exception. When the processor is executing an exception handler, the
+     * exception handler is preempted if a higher priority exception occurs. 
+     * Note: 'EXTI0_IRQn' stands for EXTI Line0 Interrupt */
+    NVIC->IP[EXTI0_IRQn] = 0;
 
-   /* Enable the Selected IRQ Channels */
-   NVIC->ISER[0] = (uint32_t) 0x01 << EXTI0_IRQn;
+    /* Enable the Selected IRQ Channels */
+    NVIC->ISER[0] = (uint32_t) 0x01 << EXTI0_IRQn;
 
-   while (1){
-      udelay (DELAY);
-      GPIOD->ODR |= (1 << currentLED);    /* led on */
-      udelay (DELAY);
-      GPIOD->ODR &= ~(1 << currentLED);   /* led off */
-   }
+    while (1) {
+        udelay(DELAY);
+        GPIOD->ODR |= (1 << currentLED);    /* led on */
+        udelay(DELAY);
+        GPIOD->ODR &= ~(1 << currentLED);   /* led off */
+    }
 }
-
