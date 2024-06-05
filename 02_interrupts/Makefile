@@ -11,7 +11,7 @@ GDB=arm-none-eabi-gdb
 MKDIR=mkdir -p
 
 AFLAGS  = -mlittle-endian -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
-CFLAGS  = -g -O0 -Wall
+CFLAGS  = -g -Os -Wall
 CFLAGS += $(AFLAGS)
 CFLAGS += -Isrc/ -I./src/include/
 LDFLAGS = -Tstm32_flash.ld $(AFLAGS)
