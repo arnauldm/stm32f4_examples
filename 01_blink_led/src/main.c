@@ -27,10 +27,10 @@ int main(void)
 
     while (1) {
         udelay(DELAY);
-        GPIOD->ODR |=  (1 << GREEN_LED);    /* led on */
-        GPIOD->ODR &= ~(1 << RED_LED);      /* led off */
+        GPIOD->ODR |= (1 << GREEN_LED); /* led on */
+        GPIOD->ODR &= ~(1 << RED_LED);  /* led off */
         udelay(DELAY);
         GPIOD->ODR &= ~(1 << GREEN_LED);    /* led off */
-        GPIOD->ODR |=  (1 << RED_LED);      /* led on */
+        GPIOD->ODR |= (1 << RED_LED);   /* led on */
     }
 }

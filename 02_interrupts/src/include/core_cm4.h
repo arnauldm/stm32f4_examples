@@ -1175,9 +1175,10 @@ static __INLINE uint32_t NVIC_GetPriority(IRQn_Type IRQn)
 {
 
   if(IRQn < 0) {
-    return((uint32_t)(SCB->SHP[((uint32_t)(IRQn) & 0xF)-4] >> (8 - __NVIC_PRIO_BITS)));  } /* get priority for Cortex-M  system interrupts */
-  else {
-    return((uint32_t)(NVIC->IP[(uint32_t)(IRQn)]           >> (8 - __NVIC_PRIO_BITS)));  } /* get priority for device specific interrupts  */
+    return((uint32_t)(SCB->SHP[((uint32_t)(IRQn) & 0xF)-4] >> (8 - __NVIC_PRIO_BITS)));
+  } else {
+    return((uint32_t)(NVIC->IP[(uint32_t)(IRQn)]           >> (8 - __NVIC_PRIO_BITS)));
+  } /* get priority for device specific interrupts  */
 }
 
 
@@ -1245,17 +1246,17 @@ static __INLINE void NVIC_DecodePriority (uint32_t Priority, uint32_t PriorityGr
  */
 static __INLINE void NVIC_SystemReset(void)
 {
-    /* Ensure all outstanding memory accesses included buffered write
-     * are completed before reset */
-  __ASM volatile ("dsb");
+  __ASM volatile ("dsb"); /* Ensure all outstanding memory accesses
+included buffered write are completed before reset */
 
   SCB->AIRCR  = ((0x5FA << SCB_AIRCR_VECTKEY_Pos)      |
                  (SCB->AIRCR & SCB_AIRCR_PRIGROUP_Msk) |
                  SCB_AIRCR_SYSRESETREQ_Msk);                   /* Keep priority group unchanged */
 
-  __ASM volatile ("dsb");
+  __ASM volatile ("dsb"); /* Ensure all outstanding memory accesses
+included buffered write are completed before reset */
 
-  while(1); /* wait until reset */
+  while(1);                                                    /* wait until reset */
 }
 
 /*@} end of CMSIS_Core_NVICFunctions */

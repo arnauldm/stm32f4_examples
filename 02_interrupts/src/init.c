@@ -11,9 +11,9 @@
 void SetSysClock(void)
 {
 
-    /**********************************************************/
-    /*    PLL (clocked by HSE) used as System clock source    */
-    /**********************************************************/
+    /********************************************************/
+    /*  PLL (clocked by HSE) used as System clock source    */
+    /********************************************************/
     __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
 
     /* Enable HSE */
@@ -65,15 +65,13 @@ void SetSysClock(void)
         RCC->CFGR |= RCC_CFGR_SW_PLL;
 
         /* Wait till the main PLL is used as system clock source */
-        while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {
-        }
+        while ((RCC->CFGR & (uint32_t) RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
     } else {
         /* If HSE fails to start-up, the application will have wrong clock
            configuration. User can add here some code to deal with this error */
     }
 
 }
-
 
 /* void system_init(void)
  * Setup the microcontroller system
