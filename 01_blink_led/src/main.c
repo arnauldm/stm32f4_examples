@@ -7,9 +7,9 @@
 #define GREEN_LED 12
 #define RED_LED 14
 
-void udelay(__IO uint32_t d)
+void udelay(volatile uint32_t d)
 {
-    __IO uint32_t i = 0;
+    volatile uint32_t i = 0;
     for (i = 0; i < d; i++);
 }
 

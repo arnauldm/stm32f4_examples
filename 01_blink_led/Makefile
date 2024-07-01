@@ -7,28 +7,28 @@ FLAGS  = -mlittle-endian -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-
 
 CFLAGS  = -g -Os -Wall
 CFLAGS += $(FLAGS)
-CFLAGS += -Isrc/ -I./src/include/
+CFLAGS += -Isrc/
 
 LDFLAGS = -Tstm32_flash.ld -nostdlib $(FLAGS)
 
 # Sources files
 # C
-SRC = $(wildcard src/*.c)
-OBJ = $(patsubst %.c, build/%.o, $(notdir $(SRC)))
+OBJ = $(patsubst %.c, build/%.o, $(notdir $(wildcard src/*.c)))
 
 # Assembly
-SSRC = src/startup_stm32f4xx.s
-SOBJ = $(patsubst %.s, build/%.o, $(notdir $(SSRC)))
+SOBJ = $(patsubst %.s, build/%.o, $(notdir $(wildcard src/*.s)))
+
+DEPENDS = $(wildcard src/*.h)
 
 all: build blinky.elf
 
 build:
 	mkdir -p $@
 
-build/%.o: src/%.s
+build/%.o: src/%.s $(DEPENDS)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
-build/%.o: src/%.c
+build/%.o: src/%.c $(DEPENDS)
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 blinky.elf: $(OBJ) $(SOBJ)
