@@ -10,9 +10,9 @@
 
 int currentLED = LED_GREEN;
 
-void udelay(__IO uint32_t d)
+void udelay(volatile uint32_t d)
 {
-    __IO uint32_t i = 0;
+    volatile uint32_t i = 0;
     for (i = 0; i < d; i++);
 }
 
@@ -34,7 +34,7 @@ int main(void)
 
     system_init();
 
-    /* 
+    /*
      * Enable LEDs
      */
 
